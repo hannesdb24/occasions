@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { GERMAN_STATES } from "@/types";
 
 const categories = [
   { value: "FAMILY", label: "Familie" },
@@ -46,6 +45,20 @@ const relationshipTypes = [
   ]},
 ];
 
+const LINK_TYPES = [
+  { value: "COUPLE",     label: "Paar / verheiratet" },
+  { value: "PARENT_OF",  label: "Elternteil von" },
+  { value: "SIBLINGS",   label: "Geschwister" },
+  { value: "OTHER",      label: "Sonstige Verbindung" },
+];
+
+const LINK_TYPE_LABELS: Record<string, string> = {
+  COUPLE: "Paar",
+  PARENT_OF: "Elternteil von",
+  SIBLINGS: "Geschwister",
+  OTHER: "Verbunden",
+};
+
 const keepInTouchOptions = [
   { value: "", label: "Keine Erinnerung" },
   { value: "14", label: "Alle 2 Wochen" },
@@ -55,12 +68,8 @@ const keepInTouchOptions = [
   { value: "365", label: "Einmal im Jahr" },
 ];
 
-interface CustomEvent {
-  id?: string;
-  title: string;
-  date: string;
-  isRecurring: boolean;
-}
+interface CustomEvent { id?: string; title: string; date: string; isRecurring: boolean; }
+interface ContactLink { id: string; linkType: string; from: { id: string; name: string }; to: { id: string; name: string }; }
 
 function getAvatarColor(name: string): string {
   const colors = ["#B85968", "#A8895C", "#C4623D", "#5B7FA6", "#6B8F5E"];
@@ -73,58 +82,58 @@ export default function EditContactPage() {
   const id = params.id as string;
 
   const [allContacts, setAllContacts] = useState<{ id: string; name: string }[]>([]);
+  const [links, setLinks] = useState<ContactLink[]>([]);
+  const [newLink, setNewLink] = useState({ toId: "", linkType: "COUPLE" });
+  const [showAddLink, setShowAddLink] = useState(false);
+
   const [form, setForm] = useState({
     name: "", birthday: "", category: "FAMILY", relationshipType: "",
     state: "", notes: "", email: "", phone: "", address: "", city: "", zip: "",
-    interests: "", keepInTouchDays: "", relatedContactId: "",
+    interests: "", keepInTouchDays: "",
   });
   const [customEvents, setCustomEvents] = useState<CustomEvent[]>([]);
   const [newEvent, setNewEvent] = useState<CustomEvent>({ title: "", date: "", isRecurring: true });
   const [showAddEvent, setShowAddEvent] = useState(false);
   const [interestInput, setInterestInput] = useState("");
+  const [tagList, setTagList] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState("");
-  const [tagList, setTagList] = useState<string[]>([]);
 
   useEffect(() => {
     fetch("/api/contacts").then((r) => r.json()).then((data) => {
       setAllContacts(data.map((c: any) => ({ id: c.id, name: c.name })));
     });
-  }, []);
+    fetch(`/api/contacts/${id}/links`).then((r) => r.json()).then(setLinks);
+  }, [id]);
 
   useEffect(() => {
-    fetch(`/api/contacts/${id}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setForm({
-          name: data.name ?? "",
-          birthday: data.birthday ? new Date(data.birthday).toISOString().split("T")[0] : "",
-          category: data.category ?? "FAMILY",
-          relationshipType: data.relationshipType ?? "",
-          state: data.state ?? "",
-          notes: data.notes ?? "",
-          email: data.email ?? "",
-          phone: data.phone ?? "",
-          address: data.address ?? "",
-          city: data.city ?? "",
-          zip: data.zip ?? "",
-          interests: data.interests ?? "",
-          keepInTouchDays: data.keepInTouchDays ? String(data.keepInTouchDays) : "",
-          relatedContactId: data.relatedContactId ?? "",
-        });
-        if (data.interests) {
-          setTagList(data.interests.split(",").map((t: string) => t.trim()).filter(Boolean));
-        }
-        const nonBirthday = (data.events ?? []).filter((e: any) => e.eventType !== "BIRTHDAY");
-        setCustomEvents(nonBirthday.map((e: any) => ({
-          id: e.id,
-          title: e.title,
-          date: new Date(e.date).toISOString().split("T")[0],
-          isRecurring: e.isRecurring,
-        })));
-        setFetching(false);
+    fetch(`/api/contacts/${id}`).then((r) => r.json()).then((data) => {
+      setForm({
+        name: data.name ?? "",
+        birthday: data.birthday ? new Date(data.birthday).toISOString().split("T")[0] : "",
+        category: data.category ?? "FAMILY",
+        relationshipType: data.relationshipType ?? "",
+        state: data.state ?? "",
+        notes: data.notes ?? "",
+        email: data.email ?? "",
+        phone: data.phone ?? "",
+        address: data.address ?? "",
+        city: data.city ?? "",
+        zip: data.zip ?? "",
+        interests: data.interests ?? "",
+        keepInTouchDays: data.keepInTouchDays ? String(data.keepInTouchDays) : "",
       });
+      if (data.interests) {
+        setTagList(data.interests.split(",").map((t: string) => t.trim()).filter(Boolean));
+      }
+      setCustomEvents(
+        (data.events ?? [])
+          .filter((e: any) => e.eventType !== "BIRTHDAY")
+          .map((e: any) => ({ id: e.id, title: e.title, date: new Date(e.date).toISOString().split("T")[0], isRecurring: e.isRecurring }))
+      );
+      setFetching(false);
+    });
   }, [id]);
 
   function addTag(e: React.KeyboardEvent) {
@@ -166,11 +175,30 @@ export default function EditContactPage() {
     setCustomEvents(customEvents.filter((e) => e.id !== eventId));
   }
 
+  async function addLink() {
+    if (!newLink.toId) return;
+    const res = await fetch(`/api/contacts/${id}/links`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newLink),
+    });
+    if (res.ok) {
+      const created = await res.json();
+      setLinks([...links, created]);
+      setNewLink({ toId: "", linkType: "COUPLE" });
+      setShowAddLink(false);
+    }
+  }
+
+  async function removeLink(linkId: string) {
+    await fetch(`/api/contacts/${id}/links/${linkId}`, { method: "DELETE" });
+    setLinks(links.filter((l) => l.id !== linkId));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
-
     const res = await fetch(`/api/contacts/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -188,10 +216,8 @@ export default function EditContactPage() {
         zip: form.zip || null,
         interests: tagList.join(", ") || null,
         keepInTouchDays: form.keepInTouchDays ? parseInt(form.keepInTouchDays) : null,
-        relatedContactId: form.relatedContactId || null,
       }),
     });
-
     if (!res.ok) {
       const data = await res.json();
       setError(data.error ?? "Fehler beim Speichern");
@@ -203,14 +229,13 @@ export default function EditContactPage() {
 
   const inputClass = "w-full px-4 py-2.5 border-hairline rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c4704a]/30 bg-[var(--background)] text-sm transition-considered";
   const labelClass = "block text-xs font-semibold tracking-wider uppercase text-[#c4704a] mb-2";
+  const otherContacts = allContacts.filter((c) => c.id !== id && !links.some((l) => l.from.id === c.id || l.to.id === c.id));
 
   if (fetching) {
     return (
       <div className="max-w-xl">
         <div className="h-8 w-48 bg-[rgba(28,25,22,0.06)] rounded-lg animate-pulse mb-8" />
-        <div className="space-y-4">
-          {[1,2,3].map((i) => <div key={i} className="h-32 bg-[rgba(28,25,22,0.04)] rounded-2xl animate-pulse" />)}
-        </div>
+        <div className="space-y-4">{[1,2,3].map((i) => <div key={i} className="h-32 bg-[rgba(28,25,22,0.04)] rounded-2xl animate-pulse" />)}</div>
       </div>
     );
   }
@@ -240,7 +265,7 @@ export default function EditContactPage() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
 
-        {/* About them */}
+        {/* Über die Person */}
         <section className="bg-card border-hairline rounded-2xl p-6 space-y-4">
           <div className="flex items-center gap-2 mb-1">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#c4704a]"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
@@ -252,7 +277,7 @@ export default function EditContactPage() {
               <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>Beziehung</label>
+              <label className={labelClass}>Beziehung zu dir</label>
               <select value={form.relationshipType} onChange={(e) => setForm({ ...form, relationshipType: e.target.value })} className={inputClass}>
                 <option value="">–</option>
                 {relationshipTypes.map((group) => (
@@ -263,25 +288,6 @@ export default function EditContactPage() {
               </select>
             </div>
           </div>
-          {allContacts.filter((c) => c.id !== id).length > 0 && (
-            <div>
-              <label className={labelClass}>Verbunden mit</label>
-              <select
-                value={form.relatedContactId}
-                onChange={(e) => setForm({ ...form, relatedContactId: e.target.value })}
-                className={inputClass}
-              >
-                <option value="">Keine Verknüpfung</option>
-                {allContacts.filter((c) => c.id !== id).map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-              <p className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>
-                z.B. Schwager verknüpfen mit der Schwester, die auch im Adressbuch ist.
-              </p>
-            </div>
-          )}
-
           <div>
             <label className={labelClass}>Kategorie</label>
             <div className="grid grid-cols-3 gap-2">
@@ -295,7 +301,82 @@ export default function EditContactPage() {
           </div>
         </section>
 
-        {/* Contact details */}
+        {/* Verbindungen zwischen Kontakten */}
+        <section className="bg-card border-hairline rounded-2xl p-6 space-y-4">
+          <div className="flex items-center gap-2 mb-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#c4704a]"><circle cx="6" cy="12" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><line x1="8" y1="11" x2="16" y2="7"/><line x1="8" y1="13" x2="16" y2="17"/></svg>
+            <span className="kicker">Verbindungen</span>
+          </div>
+          <p className="text-xs -mt-2" style={{ color: "var(--muted-foreground)" }}>
+            Wie ist {form.name || "diese Person"} mit anderen in deinem Netzwerk verwandt oder verbunden?
+          </p>
+
+          {links.length > 0 && (
+            <div className="space-y-2">
+              {links.map((link) => {
+                const other = link.from.id === id ? link.to : link.from;
+                const typeLabel = LINK_TYPE_LABELS[link.linkType] ?? link.linkType;
+                const isParent = link.linkType === "PARENT_OF" && link.from.id === id;
+                const isChild = link.linkType === "PARENT_OF" && link.to.id === id;
+                const displayLabel = isParent ? "Elternteil von" : isChild ? "Kind von" : typeLabel;
+                return (
+                  <div key={link.id} className="flex items-center justify-between py-2.5 px-3 border-hairline rounded-xl">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-serif font-medium shrink-0"
+                        style={{ backgroundColor: getAvatarColor(other.name) }}>
+                        {other.name.charAt(0)}
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium text-[var(--foreground)]">{other.name}</span>
+                        <span className="text-xs ml-2 px-2 py-0.5 rounded-full bg-[rgba(28,25,22,0.06)]" style={{ color: "var(--muted-foreground)" }}>
+                          {displayLabel}
+                        </span>
+                      </div>
+                    </div>
+                    <button type="button" onClick={() => removeLink(link.id)}
+                      className="text-xs px-2 py-1 rounded-lg text-red-400 hover:bg-red-50 transition-considered">✕</button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {showAddLink ? (
+            <div className="border-brass-hairline rounded-xl p-4 space-y-3 bg-[#c4704a]/3">
+              <div>
+                <label className={labelClass}>Person</label>
+                <select value={newLink.toId} onChange={(e) => setNewLink({ ...newLink, toId: e.target.value })} className={inputClass}>
+                  <option value="">– Bitte wählen –</option>
+                  {otherContacts.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className={labelClass}>Art der Verbindung</label>
+                <select value={newLink.linkType} onChange={(e) => setNewLink({ ...newLink, linkType: e.target.value })} className={inputClass}>
+                  {LINK_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                </select>
+              </div>
+              <div className="flex gap-2">
+                <button type="button" onClick={addLink} disabled={!newLink.toId}
+                  className="flex-1 py-2 bg-[var(--foreground)] text-[var(--card)] rounded-full text-sm font-medium hover:opacity-90 disabled:opacity-40 transition-considered">
+                  Hinzufügen
+                </button>
+                <button type="button" onClick={() => setShowAddLink(false)}
+                  className="px-4 py-2 border-hairline rounded-full text-sm transition-considered hover:bg-[rgba(28,25,22,0.04)]">
+                  Abbrechen
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button type="button" onClick={() => setShowAddLink(true)} disabled={otherContacts.length === 0}
+              className="flex items-center gap-2 text-sm text-[#c4704a] font-medium hover:text-[#a85c38] disabled:opacity-40 transition-considered">
+              <span className="text-lg leading-none">+</span>
+              {otherContacts.length === 0 ? "Alle Kontakte bereits verknüpft" : "Verbindung hinzufügen"}
+            </button>
+          )}
+        </section>
+
+        {/* Kontaktdaten */}
         <section className="bg-card border-hairline rounded-2xl p-6 space-y-4">
           <div className="flex items-center gap-2 mb-1">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#c4704a]"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
@@ -327,7 +408,7 @@ export default function EditContactPage() {
           </div>
         </section>
 
-        {/* Important dates */}
+        {/* Wichtige Daten */}
         <section className="bg-card border-hairline rounded-2xl p-6 space-y-4">
           <div className="flex items-center gap-2 mb-1">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#c4704a]"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
@@ -337,7 +418,6 @@ export default function EditContactPage() {
             <label className={labelClass}>Geburtstag</label>
             <input type="date" value={form.birthday} onChange={(e) => setForm({ ...form, birthday: e.target.value })} className={inputClass} />
           </div>
-
           {customEvents.length > 0 && (
             <div className="space-y-2">
               <label className={labelClass}>Weitere Daten</label>
@@ -356,43 +436,33 @@ export default function EditContactPage() {
               ))}
             </div>
           )}
-
           {showAddEvent ? (
             <div className="border-brass-hairline rounded-xl p-4 space-y-3 bg-[#c4704a]/3">
               <div>
                 <label className={labelClass}>Bezeichnung</label>
-                <input type="text" value={newEvent.title} onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                  className={inputClass} placeholder="z.B. Jahrestag, Kennenlerntag..." />
+                <input type="text" value={newEvent.title} onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })} className={inputClass} placeholder="z.B. Jahrestag, Kennenlerntag..." />
               </div>
               <div>
                 <label className={labelClass}>Datum</label>
                 <input type="date" value={newEvent.date} onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })} className={inputClass} />
               </div>
               <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" checked={newEvent.isRecurring} onChange={(e) => setNewEvent({ ...newEvent, isRecurring: e.target.checked })}
-                  className="rounded accent-[#c4704a]" />
+                <input type="checkbox" checked={newEvent.isRecurring} onChange={(e) => setNewEvent({ ...newEvent, isRecurring: e.target.checked })} className="rounded accent-[#c4704a]" />
                 Jährlich wiederholen
               </label>
               <div className="flex gap-2">
-                <button type="button" onClick={addCustomEvent}
-                  className="flex-1 py-2 bg-[var(--foreground)] text-[var(--card)] rounded-full text-sm font-medium hover:opacity-90 transition-considered">
-                  Hinzufügen
-                </button>
-                <button type="button" onClick={() => setShowAddEvent(false)}
-                  className="px-4 py-2 border-hairline rounded-full text-sm transition-considered hover:bg-[rgba(28,25,22,0.04)]">
-                  Abbrechen
-                </button>
+                <button type="button" onClick={addCustomEvent} className="flex-1 py-2 bg-[var(--foreground)] text-[var(--card)] rounded-full text-sm font-medium hover:opacity-90 transition-considered">Hinzufügen</button>
+                <button type="button" onClick={() => setShowAddEvent(false)} className="px-4 py-2 border-hairline rounded-full text-sm transition-considered hover:bg-[rgba(28,25,22,0.04)]">Abbrechen</button>
               </div>
             </div>
           ) : (
-            <button type="button" onClick={() => setShowAddEvent(true)}
-              className="flex items-center gap-2 text-sm text-[#c4704a] font-medium hover:text-[#a85c38] transition-considered">
+            <button type="button" onClick={() => setShowAddEvent(true)} className="flex items-center gap-2 text-sm text-[#c4704a] font-medium hover:text-[#a85c38] transition-considered">
               <span className="text-lg leading-none">+</span> Weiteres Datum hinzufügen
             </button>
           )}
         </section>
 
-        {/* Personality & Notes */}
+        {/* Persönlichkeit & Notizen */}
         <section className="bg-card border-hairline rounded-2xl p-6 space-y-4">
           <div className="flex items-center gap-2 mb-1">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#c4704a]"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
@@ -422,17 +492,13 @@ export default function EditContactPage() {
           <div>
             <label className={labelClass}>Private Notizen</label>
             <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              rows={3} className={`${inputClass} resize-none`}
-              placeholder="Konfektionsgröße, Allergien, Vorlieben..." />
+              rows={3} className={`${inputClass} resize-none`} placeholder="Konfektionsgröße, Allergien, Vorlieben..." />
           </div>
           <div>
             <label className={labelClass}>In Kontakt bleiben</label>
             <select value={form.keepInTouchDays} onChange={(e) => setForm({ ...form, keepInTouchDays: e.target.value })} className={inputClass}>
               {keepInTouchOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
-            <p className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>
-              Wir erinnern dich sanft, wenn du zu lange nichts von dieser Person gehört hast.
-            </p>
           </div>
         </section>
 
@@ -441,8 +507,7 @@ export default function EditContactPage() {
             className="flex-1 py-2.5 bg-[var(--foreground)] text-[var(--card)] rounded-full font-medium text-sm hover:opacity-90 disabled:opacity-50 transition-considered">
             {loading ? "Wird gespeichert..." : "Änderungen speichern"}
           </button>
-          <Link href={`/contacts/${id}`}
-            className="px-6 py-2.5 border-hairline rounded-full text-sm font-medium transition-considered hover:bg-[rgba(28,25,22,0.04)]">
+          <Link href={`/contacts/${id}`} className="px-6 py-2.5 border-hairline rounded-full text-sm font-medium transition-considered hover:bg-[rgba(28,25,22,0.04)]">
             Abbrechen
           </Link>
         </div>

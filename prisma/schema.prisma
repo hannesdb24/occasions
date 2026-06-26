@@ -49,15 +49,14 @@ model Contact {
   zip              String?
   interests        String?
   keepInTouchDays  Int?
-  relatedContactId String?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
-  user           User     @relation("ContactOwner", fields: [userId], references: [id], onDelete: Cascade)
-  linkedUser     User?    @relation("LinkedContact", fields: [linkedUserId], references: [id])
-  events         Event[]
-  relatedContact Contact? @relation("ContactLink", fields: [relatedContactId], references: [id], onDelete: SetNull)
-  linkedBy       Contact[] @relation("ContactLink")
+  user        User          @relation("ContactOwner", fields: [userId], references: [id], onDelete: Cascade)
+  linkedUser  User?         @relation("LinkedContact", fields: [linkedUserId], references: [id])
+  events      Event[]
+  linksFrom   ContactLink[] @relation("LinkFrom")
+  linksTo     ContactLink[] @relation("LinkTo")
 
   @@index([userId])
 }
@@ -89,6 +88,23 @@ enum RelationshipType {
   FRIEND
   COLLEAGUE
   OTHER
+}
+
+model ContactLink {
+  id        String   @id @default(cuid())
+  userId    String
+  fromId    String
+  toId      String
+  linkType  String   @default("OTHER")
+  createdAt DateTime @default(now())
+
+  from Contact @relation("LinkFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to   Contact @relation("LinkTo",   fields: [toId],   references: [id], onDelete: Cascade)
+
+  @@unique([fromId, toId])
+  @@index([userId])
+  @@index([fromId])
+  @@index([toId])
 }
 
 model Event {

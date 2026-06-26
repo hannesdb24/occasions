@@ -4,12 +4,20 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { RELATIONSHIP_TYPE_LABELS } from "@/types";
 
+interface ContactLink {
+  id: string;
+  linkType: string;
+  fromId?: string;
+  toId?: string;
+}
+
 interface NetworkContact {
   id: string;
   name: string;
   category: string;
   relationshipType: string | null;
-  relatedContactId?: string | null;
+  linksFrom?: ContactLink[];
+  linksTo?: ContactLink[];
 }
 
 const CATEGORY_CONFIG: Record<string, { color: string; lineColor: string; label: string }> = {
@@ -112,23 +120,39 @@ export function ContactNetwork({
         style={{ maxHeight: 580 }}
         aria-label="Kontakt-Netzwerk"
       >
-        {/* Kontakt-zu-Kontakt-Verbindungen (gestrichelt) */}
-        {positions.map(({ contact, x, y }) => {
-          if (!contact.relatedContactId) return null;
-          const target = positions.find((p) => p.contact.id === contact.relatedContactId);
-          if (!target) return null;
-          return (
-            <line
-              key={`link-${contact.id}`}
-              x1={x} y1={y}
-              x2={target.x} y2={target.y}
-              stroke="#c4704a"
-              strokeWidth={1.5}
-              strokeOpacity={0.4}
-              strokeDasharray="5 4"
-            />
-          );
-        })}
+        {/* Kontakt-zu-Kontakt-Verbindungen */}
+        {(() => {
+          const drawn = new Set<string>();
+          const lines: React.ReactNode[] = [];
+          const LINK_COLORS: Record<string, { stroke: string; dash?: string; width: number }> = {
+            COUPLE:    { stroke: "#B85968", width: 2.5 },
+            PARENT_OF: { stroke: "#A8895C", width: 2, dash: "6 3" },
+            SIBLINGS:  { stroke: "#5B7FA6", width: 2, dash: "4 4" },
+            OTHER:     { stroke: "#8B7B6B", width: 1.5, dash: "3 5" },
+          };
+          for (const { contact, x, y } of positions) {
+            const allLinks = [...(contact.linksFrom ?? []), ...(contact.linksTo ?? [])];
+            for (const link of allLinks) {
+              if (drawn.has(link.id)) continue;
+              drawn.add(link.id);
+              const otherId = link.fromId === contact.id ? link.toId : link.fromId;
+              const target = positions.find((p) => p.contact.id === otherId);
+              if (!target) continue;
+              const cfg = LINK_COLORS[link.linkType] ?? LINK_COLORS.OTHER;
+              lines.push(
+                <line
+                  key={`clink-${link.id}`}
+                  x1={x} y1={y} x2={target.x} y2={target.y}
+                  stroke={cfg.stroke}
+                  strokeWidth={cfg.width}
+                  strokeOpacity={0.55}
+                  strokeDasharray={cfg.dash}
+                />
+              );
+            }
+          }
+          return lines;
+        })()}
 
         {/* Verbindungslinien zur Mitte */}
         {positions.map(({ contact, x, y, cat }) => {
@@ -259,21 +283,29 @@ export function ContactNetwork({
       </svg>
 
       {/* Legende */}
-      <div className="flex flex-wrap justify-center gap-3 mt-2 pb-2">
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-2 pb-2">
         {activeCats.map((cat) => {
           const cfg = CATEGORY_CONFIG[cat];
           return (
             <div key={cat} className="flex items-center gap-1.5">
-              <span
-                className="inline-block w-2.5 h-2.5 rounded-full"
-                style={{ backgroundColor: cfg.color }}
-              />
-              <span className="text-xs font-medium" style={{ color: "var(--muted-foreground)" }}>
-                {cfg.label}
-              </span>
+              <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cfg.color }} />
+              <span className="text-xs font-medium" style={{ color: "var(--muted-foreground)" }}>{cfg.label}</span>
             </div>
           );
         })}
+        <div className="w-full" />
+        {[
+          { color: "#B85968", label: "Paar", dash: false },
+          { color: "#A8895C", label: "Elternteil von", dash: true },
+          { color: "#5B7FA6", label: "Geschwister", dash: true },
+        ].map(({ color, label, dash }) => (
+          <div key={label} className="flex items-center gap-1.5">
+            <svg width="18" height="8" viewBox="0 0 18 8">
+              <line x1="0" y1="4" x2="18" y2="4" stroke={color} strokeWidth="2" strokeDasharray={dash ? "4 3" : undefined} />
+            </svg>
+            <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>{label}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
