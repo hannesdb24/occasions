@@ -10,14 +10,17 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  name         String?
-  passwordHash String
-  image        String?
-  state        String?  // Bundesland-Code z.B. "BY", "BE"
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                    String   @id @default(cuid())
+  email                 String   @unique
+  name                  String?
+  passwordHash          String
+  image                 String?
+  state                 String?
+  emailRemindersEnabled Boolean  @default(true)
+  digestTime            String   @default("08:00")
+  reminderLeadDays      Int      @default(7)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   contacts         Contact[]         @relation("ContactOwner")
   linkedContacts   Contact[]         @relation("LinkedContact")
@@ -31,14 +34,21 @@ model User {
 model Contact {
   id               String           @id @default(cuid())
   userId           String
-  linkedUserId     String?          // Falls der Kontakt auch ein App-Nutzer ist
+  linkedUserId     String?
   name             String
   birthday         DateTime?
   photoUrl         String?
   category         ContactCategory
   relationshipType RelationshipType?
-  state            String?          // Bundesland für länderspezifische Feiertage
+  state            String?
   notes            String?
+  email            String?
+  phone            String?
+  address          String?
+  city             String?
+  zip              String?
+  interests        String?          // Kommagetrennte Tags
+  keepInTouchDays  Int?             // null = keine Erinnerung
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 

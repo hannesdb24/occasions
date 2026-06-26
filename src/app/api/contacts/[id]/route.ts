@@ -14,6 +14,13 @@ const updateContactSchema = z.object({
   state: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
   photoUrl: z.string().url().optional().nullable(),
+  email: z.string().email().optional().nullable(),
+  phone: z.string().optional().nullable(),
+  address: z.string().optional().nullable(),
+  city: z.string().optional().nullable(),
+  zip: z.string().optional().nullable(),
+  interests: z.string().optional().nullable(),
+  keepInTouchDays: z.number().int().optional().nullable(),
 });
 
 async function getContactAndVerify(id: string, userId: string) {
@@ -59,6 +66,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         ...(data.state !== undefined && { state: data.state }),
         ...(data.notes !== undefined && { notes: data.notes }),
         ...(data.photoUrl !== undefined && { photoUrl: data.photoUrl }),
+        ...(data.email !== undefined && { email: data.email }),
+        ...(data.phone !== undefined && { phone: data.phone }),
+        ...(data.address !== undefined && { address: data.address }),
+        ...(data.city !== undefined && { city: data.city }),
+        ...(data.zip !== undefined && { zip: data.zip }),
+        ...(data.interests !== undefined && { interests: data.interests }),
+        ...(data.keepInTouchDays !== undefined && { keepInTouchDays: data.keepInTouchDays }),
       },
     });
 
