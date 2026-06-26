@@ -209,21 +209,14 @@ export default async function DashboardPage() {
         <div className="lg:col-span-3">
           {featuredEvent ? (
             <article className="border-brass-hairline bg-card rounded-2xl overflow-hidden">
-              <div className="aspect-[16/9] bg-[var(--foreground)]/5 relative overflow-hidden">
+              <div className="aspect-[16/9] relative overflow-hidden bg-[#f0e4d4]">
                 <Image
-                  src="/hero.jpg"
+                  src="/hero.png"
                   alt=""
                   fill
                   className="object-cover"
-                  onError={() => {}}
                   unoptimized
                 />
-                <div className="absolute inset-0 bg-gradient-to-br from-[#f5ede6] via-[#f0e4d4] to-[#e8d5c0] flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-6xl mb-3">💝</div>
-                    <p className="font-serif text-lg font-medium text-[var(--foreground)]/70">Vergiss keinen Moment</p>
-                  </div>
-                </div>
               </div>
               <div className="p-8 md:p-10">
                 <p className="kicker mb-3">Demnächst · in {featuredEvent.daysUntil} Tagen</p>
@@ -256,11 +249,8 @@ export default async function DashboardPage() {
             </article>
           ) : (
             <article className="border-brass-hairline bg-card rounded-2xl overflow-hidden">
-              <div className="aspect-[16/9] bg-gradient-to-br from-[#f5ede6] via-[#f0e4d4] to-[#e8d5c0] flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-6xl mb-3">💝</div>
-                  <p className="font-serif text-lg font-medium text-[var(--foreground)]/70">Vergiss keinen Moment</p>
-                </div>
+              <div className="aspect-[16/9] relative overflow-hidden bg-[#f0e4d4]">
+                <Image src="/hero.png" alt="" fill className="object-cover" unoptimized />
               </div>
               <div className="p-8 md:p-10">
                 <p className="kicker mb-3">Erste Schritte</p>
