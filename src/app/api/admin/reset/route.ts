@@ -7,6 +7,13 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  await prisma.wishItem.deleteMany();
+  await prisma.wishList.deleteMany();
+  await prisma.reminderSetting.deleteMany();
+  await prisma.invitation.deleteMany();
+  await prisma.event.deleteMany();
+  await prisma.contact.deleteMany();
   await prisma.user.deleteMany();
-  return NextResponse.json({ ok: true, message: "Alle User gelöscht" });
+
+  return NextResponse.json({ ok: true, message: "Alle Daten gelöscht" });
 }
