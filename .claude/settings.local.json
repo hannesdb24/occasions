@@ -12,7 +12,8 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git push *)",
-      "WebFetch(domain:occasions-production.up.railway.app)"
+      "WebFetch(domain:occasions-production.up.railway.app)",
+      "PowerShell(if \\(!\\(Test-Path \"C:\\\\Users\\\\wendo\\\\Claude\\\\Projects\\\\Geschenkideen\\\\occasions\\\\.github\\\\workflows\"\\)\\) { New-Item -ItemType Directory -Force \"C:\\\\Users\\\\wendo\\\\Claude\\\\Projects\\\\Geschenkideen\\\\occasions\\\\.github\\\\workflows\" })"
     ]
   }
 }

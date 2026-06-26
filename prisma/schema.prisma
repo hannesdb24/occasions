@@ -47,14 +47,17 @@ model Contact {
   address          String?
   city             String?
   zip              String?
-  interests        String?          // Kommagetrennte Tags
-  keepInTouchDays  Int?             // null = keine Erinnerung
+  interests        String?
+  keepInTouchDays  Int?
+  relatedContactId String?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
-  user        User    @relation("ContactOwner", fields: [userId], references: [id], onDelete: Cascade)
-  linkedUser  User?   @relation("LinkedContact", fields: [linkedUserId], references: [id])
-  events      Event[]
+  user           User     @relation("ContactOwner", fields: [userId], references: [id], onDelete: Cascade)
+  linkedUser     User?    @relation("LinkedContact", fields: [linkedUserId], references: [id])
+  events         Event[]
+  relatedContact Contact? @relation("ContactLink", fields: [relatedContactId], references: [id], onDelete: SetNull)
+  linkedBy       Contact[] @relation("ContactLink")
 
   @@index([userId])
 }
@@ -75,8 +78,14 @@ enum RelationshipType {
   PARTNER
   SPOUSE
   SIBLING
+  BROTHER_IN_LAW
+  SISTER_IN_LAW
   GRANDPARENT
   CHILD
+  UNCLE
+  AUNT
+  NEPHEW
+  NIECE
   FRIEND
   COLLEAGUE
   OTHER

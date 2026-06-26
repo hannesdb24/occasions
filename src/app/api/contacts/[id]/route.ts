@@ -8,7 +8,7 @@ const updateContactSchema = z.object({
   birthday: z.string().optional().nullable(),
   category: z.enum(["FAMILY", "PARTNER", "FRIENDS", "COLLEAGUES", "OTHER"]).optional(),
   relationshipType: z
-    .enum(["MOTHER","FATHER","STEPMOTHER","STEPFATHER","PARTNER","SPOUSE","SIBLING","GRANDPARENT","CHILD","FRIEND","COLLEAGUE","OTHER"])
+    .enum(["MOTHER","FATHER","STEPMOTHER","STEPFATHER","PARTNER","SPOUSE","SIBLING","BROTHER_IN_LAW","SISTER_IN_LAW","GRANDPARENT","CHILD","UNCLE","AUNT","NEPHEW","NIECE","FRIEND","COLLEAGUE","OTHER"])
     .optional()
     .nullable(),
   state: z.string().optional().nullable(),
@@ -21,6 +21,7 @@ const updateContactSchema = z.object({
   zip: z.string().optional().nullable(),
   interests: z.string().optional().nullable(),
   keepInTouchDays: z.number().int().optional().nullable(),
+  relatedContactId: z.string().optional().nullable(),
 });
 
 async function getContactAndVerify(id: string, userId: string) {
@@ -73,6 +74,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         ...(data.zip !== undefined && { zip: data.zip }),
         ...(data.interests !== undefined && { interests: data.interests }),
         ...(data.keepInTouchDays !== undefined && { keepInTouchDays: data.keepInTouchDays }),
+        ...(data.relatedContactId !== undefined && { relatedContactId: data.relatedContactId }),
       },
     });
 

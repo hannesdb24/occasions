@@ -14,18 +14,36 @@ const categories = [
 ];
 
 const relationshipTypes = [
-  { value: "MOTHER", label: "Mutter" },
-  { value: "FATHER", label: "Vater" },
-  { value: "STEPMOTHER", label: "Stiefmutter" },
-  { value: "STEPFATHER", label: "Stiefvater" },
-  { value: "PARTNER", label: "Partner/in" },
-  { value: "SPOUSE", label: "Ehepartner/in" },
-  { value: "SIBLING", label: "Geschwister" },
-  { value: "GRANDPARENT", label: "Großelternteil" },
-  { value: "CHILD", label: "Kind" },
-  { value: "FRIEND", label: "Freund/in" },
-  { value: "COLLEAGUE", label: "Kolleg/in" },
-  { value: "OTHER", label: "Sonstige/r" },
+  { group: "Partnerschaft", options: [
+    { value: "PARTNER", label: "Partner/in" },
+    { value: "SPOUSE", label: "Ehepartner/in" },
+  ]},
+  { group: "Eltern", options: [
+    { value: "MOTHER", label: "Mutter" },
+    { value: "FATHER", label: "Vater" },
+    { value: "STEPMOTHER", label: "Stiefmutter" },
+    { value: "STEPFATHER", label: "Stiefvater" },
+  ]},
+  { group: "Geschwister & Angeheiratete", options: [
+    { value: "SIBLING", label: "Geschwister" },
+    { value: "BROTHER_IN_LAW", label: "Schwager" },
+    { value: "SISTER_IN_LAW", label: "Schwägerin" },
+  ]},
+  { group: "Großfamilie", options: [
+    { value: "GRANDPARENT", label: "Großelternteil" },
+    { value: "UNCLE", label: "Onkel" },
+    { value: "AUNT", label: "Tante" },
+    { value: "NEPHEW", label: "Neffe" },
+    { value: "NIECE", label: "Nichte" },
+  ]},
+  { group: "Kinder", options: [
+    { value: "CHILD", label: "Kind" },
+  ]},
+  { group: "Sonstige", options: [
+    { value: "FRIEND", label: "Freund/in" },
+    { value: "COLLEAGUE", label: "Kolleg/in" },
+    { value: "OTHER", label: "Sonstige/r" },
+  ]},
 ];
 
 const keepInTouchOptions = [
@@ -54,10 +72,11 @@ export default function EditContactPage() {
   const params = useParams();
   const id = params.id as string;
 
+  const [allContacts, setAllContacts] = useState<{ id: string; name: string }[]>([]);
   const [form, setForm] = useState({
     name: "", birthday: "", category: "FAMILY", relationshipType: "",
     state: "", notes: "", email: "", phone: "", address: "", city: "", zip: "",
-    interests: "", keepInTouchDays: "",
+    interests: "", keepInTouchDays: "", relatedContactId: "",
   });
   const [customEvents, setCustomEvents] = useState<CustomEvent[]>([]);
   const [newEvent, setNewEvent] = useState<CustomEvent>({ title: "", date: "", isRecurring: true });
@@ -67,6 +86,12 @@ export default function EditContactPage() {
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState("");
   const [tagList, setTagList] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch("/api/contacts").then((r) => r.json()).then((data) => {
+      setAllContacts(data.map((c: any) => ({ id: c.id, name: c.name })));
+    });
+  }, []);
 
   useEffect(() => {
     fetch(`/api/contacts/${id}`)
@@ -86,6 +111,7 @@ export default function EditContactPage() {
           zip: data.zip ?? "",
           interests: data.interests ?? "",
           keepInTouchDays: data.keepInTouchDays ? String(data.keepInTouchDays) : "",
+          relatedContactId: data.relatedContactId ?? "",
         });
         if (data.interests) {
           setTagList(data.interests.split(",").map((t: string) => t.trim()).filter(Boolean));
@@ -162,6 +188,7 @@ export default function EditContactPage() {
         zip: form.zip || null,
         interests: tagList.join(", ") || null,
         keepInTouchDays: form.keepInTouchDays ? parseInt(form.keepInTouchDays) : null,
+        relatedContactId: form.relatedContactId || null,
       }),
     });
 
@@ -228,10 +255,33 @@ export default function EditContactPage() {
               <label className={labelClass}>Beziehung</label>
               <select value={form.relationshipType} onChange={(e) => setForm({ ...form, relationshipType: e.target.value })} className={inputClass}>
                 <option value="">–</option>
-                {relationshipTypes.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
+                {relationshipTypes.map((group) => (
+                  <optgroup key={group.group} label={group.group}>
+                    {group.options.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
+                  </optgroup>
+                ))}
               </select>
             </div>
           </div>
+          {allContacts.filter((c) => c.id !== id).length > 0 && (
+            <div>
+              <label className={labelClass}>Verbunden mit</label>
+              <select
+                value={form.relatedContactId}
+                onChange={(e) => setForm({ ...form, relatedContactId: e.target.value })}
+                className={inputClass}
+              >
+                <option value="">Keine Verknüpfung</option>
+                {allContacts.filter((c) => c.id !== id).map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+              <p className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>
+                z.B. Schwager verknüpfen mit der Schwester, die auch im Adressbuch ist.
+              </p>
+            </div>
+          )}
+
           <div>
             <label className={labelClass}>Kategorie</label>
             <div className="grid grid-cols-3 gap-2">

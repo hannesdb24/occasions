@@ -8,7 +8,7 @@ const createContactSchema = z.object({
   birthday: z.string().optional().nullable(),
   category: z.enum(["FAMILY", "PARTNER", "FRIENDS", "COLLEAGUES", "OTHER"]),
   relationshipType: z
-    .enum(["MOTHER","FATHER","STEPMOTHER","STEPFATHER","PARTNER","SPOUSE","SIBLING","GRANDPARENT","CHILD","FRIEND","COLLEAGUE","OTHER"])
+    .enum(["MOTHER","FATHER","STEPMOTHER","STEPFATHER","PARTNER","SPOUSE","SIBLING","BROTHER_IN_LAW","SISTER_IN_LAW","GRANDPARENT","CHILD","UNCLE","AUNT","NEPHEW","NIECE","FRIEND","COLLEAGUE","OTHER"])
     .optional()
     .nullable(),
   state: z.string().optional().nullable(),
