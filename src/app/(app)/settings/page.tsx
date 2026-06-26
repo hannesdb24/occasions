@@ -7,6 +7,33 @@ export default function SettingsPage() {
   const [inviteStatus, setInviteStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [inviteError, setInviteError] = useState("");
 
+  const [pwForm, setPwForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [pwStatus, setPwStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [pwError, setPwError] = useState("");
+
+  async function changePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPwError("");
+    if (pwForm.newPassword !== pwForm.confirmPassword) {
+      setPwError("Neue Passwörter stimmen nicht überein");
+      return;
+    }
+    setPwStatus("loading");
+    const res = await fetch("/api/auth/change-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword }),
+    });
+    if (res.ok) {
+      setPwStatus("success");
+      setPwForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    } else {
+      const data = await res.json();
+      setPwError(data.error ?? "Fehler beim Ändern");
+      setPwStatus("error");
+    }
+  }
+
   async function sendInvite(e: React.FormEvent) {
     e.preventDefault();
     setInviteStatus("loading");
@@ -68,6 +95,70 @@ export default function SettingsPage() {
             className="w-full py-2.5 bg-[var(--foreground)] text-[var(--card)] rounded-full font-medium text-sm hover:opacity-90 disabled:opacity-50 transition-considered"
           >
             {inviteStatus === "loading" ? "Wird gesendet..." : "Einladung senden"}
+          </button>
+        </form>
+      </section>
+
+      {/* Passwort ändern */}
+      <section className="bg-card border-hairline rounded-2xl p-6">
+        <h2 className="font-serif text-xl font-medium text-[var(--foreground)] mb-1">Passwort ändern</h2>
+        <p className="text-sm mb-5" style={{ color: "var(--muted-foreground)" }}>
+          Gib dein aktuelles Passwort ein und wähle ein neues.
+        </p>
+
+        {pwStatus === "success" && (
+          <div className="mb-4 p-3 bg-[#c4704a]/10 text-[#a85c38] rounded-xl text-sm">
+            Passwort erfolgreich geändert ✓
+          </div>
+        )}
+        {pwError && (
+          <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-xl text-sm">{pwError}</div>
+        )}
+
+        <form onSubmit={changePassword} className="space-y-3">
+          <div>
+            <label className="block text-xs font-semibold tracking-wider uppercase text-[#c4704a] mb-2">Aktuelles Passwort</label>
+            <input
+              type="password"
+              value={pwForm.currentPassword}
+              onChange={(e) => setPwForm({ ...pwForm, currentPassword: e.target.value })}
+              required
+              autoComplete="current-password"
+              className={inputClass}
+              placeholder="••••••••"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold tracking-wider uppercase text-[#c4704a] mb-2">Neues Passwort</label>
+            <input
+              type="password"
+              value={pwForm.newPassword}
+              onChange={(e) => setPwForm({ ...pwForm, newPassword: e.target.value })}
+              required
+              minLength={8}
+              autoComplete="new-password"
+              className={inputClass}
+              placeholder="Mindestens 8 Zeichen"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold tracking-wider uppercase text-[#c4704a] mb-2">Neues Passwort bestätigen</label>
+            <input
+              type="password"
+              value={pwForm.confirmPassword}
+              onChange={(e) => setPwForm({ ...pwForm, confirmPassword: e.target.value })}
+              required
+              autoComplete="new-password"
+              className={inputClass}
+              placeholder="••••••••"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={pwStatus === "loading"}
+            className="w-full py-2.5 bg-[var(--foreground)] text-[var(--card)] rounded-full font-medium text-sm hover:opacity-90 disabled:opacity-50 transition-considered"
+          >
+            {pwStatus === "loading" ? "Wird gespeichert..." : "Passwort ändern"}
           </button>
         </form>
       </section>
