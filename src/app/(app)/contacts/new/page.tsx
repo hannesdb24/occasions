@@ -30,12 +30,7 @@ const relationshipTypes = [
 export default function NewContactPage() {
   const router = useRouter();
   const [form, setForm] = useState({
-    name: "",
-    birthday: "",
-    category: "FAMILY",
-    relationshipType: "",
-    state: "",
-    notes: "",
+    name: "", birthday: "", category: "FAMILY", relationshipType: "", state: "", notes: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -67,50 +62,46 @@ export default function NewContactPage() {
     }
   }
 
+  const inputClass = "w-full px-4 py-2.5 border-hairline rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c4704a]/30 bg-[var(--background)] text-sm transition-considered";
+  const labelClass = "block text-xs font-semibold tracking-wider uppercase text-[#c4704a] mb-2";
+
   return (
     <div className="max-w-xl">
       <div className="flex items-center gap-3 mb-8">
-        <Link href="/contacts" className="text-gray-400 hover:text-gray-600 text-sm">← Kontakte</Link>
-        <h1 className="text-2xl font-bold">Neuen Kontakt anlegen</h1>
+        <Link href="/contacts" className="text-sm transition-considered hover:text-[#c4704a]" style={{ color: "var(--muted-foreground)" }}>
+          ← Personen
+        </Link>
+      </div>
+      <div className="mb-8">
+        <p className="kicker mb-2">Neu</p>
+        <h1 className="font-serif text-3xl font-medium text-[var(--foreground)]">Person anlegen</h1>
       </div>
 
-      {error && <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">{error}</div>}
+      {error && <div className="mb-5 p-3 bg-red-50 text-red-700 rounded-xl text-sm">{error}</div>}
 
-      <form onSubmit={handleSubmit} className="space-y-5 bg-white rounded-2xl border border-gray-100 p-6">
+      <form onSubmit={handleSubmit} className="space-y-5 bg-card border-hairline rounded-2xl p-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-          <input
-            type="text"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            required
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            placeholder="Vorname Nachname"
-          />
+          <label className={labelClass}>Name *</label>
+          <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required className={inputClass} placeholder="Vorname Nachname" />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Geburtsdatum</label>
-          <input
-            type="date"
-            value={form.birthday}
-            onChange={(e) => setForm({ ...form, birthday: e.target.value })}
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
+          <label className={labelClass}>Geburtsdatum</label>
+          <input type="date" value={form.birthday} onChange={(e) => setForm({ ...form, birthday: e.target.value })} className={inputClass} />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Kategorie *</label>
+          <label className={labelClass}>Kategorie *</label>
           <div className="grid grid-cols-2 gap-2">
             {categories.map((cat) => (
               <button
                 key={cat.value}
                 type="button"
                 onClick={() => setForm({ ...form, category: cat.value })}
-                className={`py-2.5 px-4 rounded-lg border text-sm font-medium transition-colors ${
+                className={`py-2.5 px-4 rounded-full border text-sm font-medium transition-considered ${
                   form.category === cat.value
-                    ? "bg-indigo-600 text-white border-indigo-600"
-                    : "border-gray-200 text-gray-600 hover:border-indigo-200"
+                    ? "bg-[var(--foreground)] text-[var(--card)] border-[var(--foreground)]"
+                    : "border-hairline text-[var(--foreground)] hover:border-[rgba(28,25,22,0.3)]"
                 }`}
               >
                 {cat.label}
@@ -120,29 +111,21 @@ export default function NewContactPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Beziehungstyp</label>
-          <select
-            value={form.relationshipType}
-            onChange={(e) => setForm({ ...form, relationshipType: e.target.value })}
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
+          <label className={labelClass}>Beziehungstyp</label>
+          <select value={form.relationshipType} onChange={(e) => setForm({ ...form, relationshipType: e.target.value })} className={inputClass}>
             <option value="">– Keiner –</option>
             {relationshipTypes.map((r) => (
               <option key={r.value} value={r.value}>{r.label}</option>
             ))}
           </select>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>
             Wird genutzt um passende Feiertage anzuzeigen (z.B. Muttertag, Vatertag)
           </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Bundesland</label>
-          <select
-            value={form.state}
-            onChange={(e) => setForm({ ...form, state: e.target.value })}
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
+          <label className={labelClass}>Bundesland</label>
+          <select value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} className={inputClass}>
             <option value="">– Keines (bundesweite Feiertage) –</option>
             {GERMAN_STATES.map((s) => (
               <option key={s.code} value={s.code}>{s.name}</option>
@@ -151,28 +134,21 @@ export default function NewContactPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Notizen</label>
+          <label className={labelClass}>Notizen</label>
           <textarea
             value={form.notes}
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
             rows={3}
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            className={`${inputClass} resize-none`}
             placeholder="Besondere Vorlieben, Interessen..."
           />
         </div>
 
         <div className="flex gap-3 pt-2">
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex-1 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
-          >
-            {loading ? "Wird gespeichert..." : "Kontakt speichern"}
+          <button type="submit" disabled={loading} className="flex-1 py-2.5 bg-[var(--foreground)] text-[var(--card)] rounded-full font-medium text-sm hover:opacity-90 disabled:opacity-50 transition-considered">
+            {loading ? "Wird gespeichert..." : "Person speichern"}
           </button>
-          <Link
-            href="/contacts"
-            className="px-6 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
-          >
+          <Link href="/contacts" className="px-6 py-2.5 border-hairline rounded-full text-sm font-medium transition-considered hover:bg-[rgba(28,25,22,0.04)]">
             Abbrechen
           </Link>
         </div>

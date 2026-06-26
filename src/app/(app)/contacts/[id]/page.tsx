@@ -2,8 +2,13 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { CATEGORY_COLORS, CATEGORY_LABELS, RELATIONSHIP_TYPE_LABELS } from "@/types";
+import { CATEGORY_LABELS, RELATIONSHIP_TYPE_LABELS } from "@/types";
 import { getRelationshipHolidays } from "@/lib/holidays";
+
+function getAvatarColor(name: string): string {
+  const colors = ["#B85968", "#A8895C", "#C4623D", "#5B7FA6", "#6B8F5E"];
+  return colors[name.charCodeAt(0) % colors.length];
+}
 
 export default async function ContactDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
@@ -27,6 +32,7 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
 
   const currentYear = new Date().getFullYear();
   const relHolidays = getRelationshipHolidays(contact.relationshipType as any, currentYear);
+  const avatarColor = getAvatarColor(contact.name);
 
   function getNextOccurrence(date: Date): Date {
     const now = new Date();
@@ -39,48 +45,58 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="max-w-2xl">
-      <div className="flex items-center gap-3 mb-6">
-        <Link href="/contacts" className="text-gray-400 hover:text-gray-600 text-sm">← Kontakte</Link>
+      <div className="flex items-center gap-3 mb-8">
+        <Link href="/contacts" className="text-sm transition-considered hover:text-[#c4704a]" style={{ color: "var(--muted-foreground)" }}>
+          ← Personen
+        </Link>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{contact.name}</h1>
-            <div className="flex items-center gap-2 mt-2">
-              <span className={`text-xs px-2 py-1 rounded-full font-medium ${CATEGORY_COLORS[contact.category]}`}>
-                {CATEGORY_LABELS[contact.category]}
-              </span>
-              {contact.relationshipType && (
-                <span className="text-sm text-gray-500">
-                  {RELATIONSHIP_TYPE_LABELS[contact.relationshipType]}
-                </span>
-              )}
+      <div className="bg-card border-hairline rounded-2xl p-6 mb-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div
+              className="rounded-full flex items-center justify-center text-white font-serif font-medium shrink-0"
+              style={{ width: 56, height: 56, fontSize: 22, backgroundColor: avatarColor }}
+            >
+              {contact.name.charAt(0).toUpperCase()}
             </div>
-            {contact.birthday && (
-              <p className="text-sm text-gray-500 mt-2">
-                🎂 {new Date(contact.birthday).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
-              </p>
-            )}
-            {contact.notes && <p className="text-sm text-gray-600 mt-3 italic">„{contact.notes}"</p>}
+            <div>
+              <h1 className="font-serif text-2xl font-medium text-[var(--foreground)]">{contact.name}</h1>
+              <div className="flex items-center gap-2 mt-1.5">
+                <span className="text-xs px-2.5 py-1 rounded-full bg-[rgba(28,25,22,0.06)] font-medium text-[var(--foreground)]">
+                  {CATEGORY_LABELS[contact.category]}
+                </span>
+                {contact.relationshipType && (
+                  <span className="text-sm" style={{ color: "var(--muted-foreground)" }}>
+                    {RELATIONSHIP_TYPE_LABELS[contact.relationshipType]}
+                  </span>
+                )}
+              </div>
+              {contact.birthday && (
+                <p className="text-sm mt-2" style={{ color: "var(--muted-foreground)" }}>
+                  {new Date(contact.birthday).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
+                </p>
+              )}
+              {contact.notes && <p className="text-sm mt-3 editorial-italic">„{contact.notes}"</p>}
+            </div>
           </div>
           <Link
             href={`/contacts/${contact.id}/edit`}
-            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 border-hairline rounded-full text-sm transition-considered hover:bg-[rgba(28,25,22,0.04)] shrink-0"
           >
             Bearbeiten
           </Link>
         </div>
 
         {contact.linkedUser && contact.linkedUser.wishList?.isPublic && contact.linkedUser.wishList.shareToken && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="mt-5 pt-5 border-t border-[rgba(28,25,22,0.08)]">
             <Link
               href={`/wishlist/${contact.linkedUser.wishList.shareToken}`}
-              className="text-sm text-indigo-600 hover:underline font-medium"
+              className="text-sm text-[#c4704a] hover:text-[#a85c38] font-medium"
             >
-              🎁 Wunschliste von {contact.name} ansehen →
+              Wunschliste von {contact.name} ansehen →
             </Link>
-            <span className="text-xs text-gray-400 ml-2">
+            <span className="text-xs ml-2" style={{ color: "var(--muted-foreground)" }}>
               ({contact.linkedUser.wishList.items.filter((i) => i.status === "OPEN").length} offen)
             </span>
           </div>
@@ -88,16 +104,14 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
       </div>
 
       {/* Anlässe */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-gray-900">Anlässe</h2>
-        </div>
+      <div className="bg-card border-hairline rounded-2xl p-6 mb-6">
+        <h2 className="font-serif text-xl font-medium text-[var(--foreground)] mb-4">Anlässe</h2>
 
         {contact.events.length === 0 && relHolidays.length === 0 && (
-          <p className="text-sm text-gray-400">Keine Anlässe eingetragen.</p>
+          <p className="text-sm editorial-italic">Keine Anlässe eingetragen.</p>
         )}
 
-        <div className="space-y-2">
+        <div className="space-y-1">
           {contact.events.map((event) => {
             const next = event.isRecurring ? getNextOccurrence(event.date) : event.date;
             const now = new Date();
@@ -105,16 +119,16 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
             const daysUntil = Math.ceil((next.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
             return (
-              <div key={event.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+              <div key={event.id} className="flex items-center justify-between py-3 border-b border-[rgba(28,25,22,0.06)] last:border-0">
                 <div>
-                  <div className="text-sm font-medium text-gray-800">{event.title}</div>
-                  <div className="text-xs text-gray-400">
+                  <div className="text-sm font-medium text-[var(--foreground)]">{event.title}</div>
+                  <div className="text-xs mt-0.5" style={{ color: "var(--muted-foreground)" }}>
                     {next.toLocaleDateString("de-DE", { day: "numeric", month: "long" })}
                     {event.isRecurring && " · jährlich"}
                   </div>
                 </div>
                 {daysUntil >= 0 && daysUntil <= 90 && (
-                  <span className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full font-medium">
+                  <span className="text-xs bg-[#c4704a]/10 text-[#c4704a] px-2.5 py-1 rounded-full font-medium">
                     in {daysUntil} Tagen
                   </span>
                 )}
@@ -127,15 +141,15 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
             now.setHours(0, 0, 0, 0);
             const daysUntil = Math.ceil((h.date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
             return (
-              <div key={h.title} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+              <div key={h.title} className="flex items-center justify-between py-3 border-b border-[rgba(28,25,22,0.06)] last:border-0">
                 <div>
-                  <div className="text-sm font-medium text-gray-800">{h.title}</div>
-                  <div className="text-xs text-gray-400">
+                  <div className="text-sm font-medium text-[var(--foreground)]">{h.title}</div>
+                  <div className="text-xs mt-0.5" style={{ color: "var(--muted-foreground)" }}>
                     {h.date.toLocaleDateString("de-DE", { day: "numeric", month: "long" })} · jährlich
                   </div>
                 </div>
                 {daysUntil >= 0 && daysUntil <= 90 && (
-                  <span className="text-xs bg-yellow-50 text-yellow-600 px-2 py-1 rounded-full font-medium">
+                  <span className="text-xs bg-[#c4704a]/10 text-[#c4704a] px-2.5 py-1 rounded-full font-medium">
                     in {daysUntil} Tagen
                   </span>
                 )}
@@ -147,25 +161,19 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
 
       {/* Einladen */}
       {!contact.linkedUserId && (
-        <div className="bg-indigo-50 rounded-2xl border border-indigo-100 p-6">
-          <h2 className="font-semibold text-indigo-900 mb-1">Zu Occasions einladen</h2>
-          <p className="text-sm text-indigo-600 mb-3">
+        <div className="border-brass-hairline bg-[#c4704a]/5 rounded-2xl p-6">
+          <h2 className="font-serif text-xl font-medium text-[var(--foreground)] mb-1">Zu Occasions einladen</h2>
+          <p className="text-sm mb-4" style={{ color: "var(--muted-foreground)" }}>
             {contact.name} kann die App nutzen, eine eigene Wunschliste erstellen und sein Netzwerk aufbauen.
           </p>
-          <InviteButton contactName={contact.name} />
+          <Link
+            href={`/settings?invite=1&name=${encodeURIComponent(contact.name)}`}
+            className="inline-flex px-5 py-2.5 bg-[var(--foreground)] text-[var(--card)] rounded-full text-sm font-medium hover:opacity-90 transition-considered"
+          >
+            {contact.name} einladen
+          </Link>
         </div>
       )}
     </div>
-  );
-}
-
-function InviteButton({ contactName }: { contactName: string }) {
-  return (
-    <Link
-      href={`/settings?invite=1&name=${encodeURIComponent(contactName)}`}
-      className="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
-    >
-      {contactName} einladen
-    </Link>
   );
 }
