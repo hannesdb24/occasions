@@ -6,7 +6,7 @@ import { z } from "zod";
 const updateContactSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   birthday: z.string().optional().nullable(),
-  category: z.enum(["FAMILY", "FRIENDS", "COLLEAGUES", "OTHER"]).optional(),
+  category: z.enum(["FAMILY", "PARTNER", "FRIENDS", "COLLEAGUES", "OTHER"]).optional(),
   relationshipType: z
     .enum(["MOTHER","FATHER","STEPMOTHER","STEPFATHER","PARTNER","SPOUSE","SIBLING","GRANDPARENT","CHILD","FRIEND","COLLEAGUE","OTHER"])
     .optional()
