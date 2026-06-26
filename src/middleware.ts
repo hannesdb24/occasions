@@ -13,7 +13,8 @@ export default auth((req) => {
     pathname.startsWith("/wishlist/") ||
     pathname.startsWith("/api/auth") ||
     pathname.startsWith("/api/wishlist/share") ||
-    pathname.startsWith("/api/invitations");
+    pathname.startsWith("/api/invitations") ||
+    pathname.startsWith("/api/admin");
 
   if (!isAuthenticated && !isPublicPath) {
     return NextResponse.redirect(new URL("/login", req.url));
