@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Playfair_Display } from "next/font/google";
+import { DM_Sans, Fraunces } from "next/font/google";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -7,11 +7,11 @@ const dmSans = DM_Sans({
   variable: "--font-dm-sans",
   axes: ["opsz"],
 });
-const playfair = Playfair_Display({
+const fraunces = Fraunces({
   subsets: ["latin"],
-  variable: "--font-playfair",
-  weight: ["400", "500", "600", "700"],
+  variable: "--font-fraunces",
   style: ["normal", "italic"],
+  axes: ["SOFT", "opsz"],
 });
 
 export const metadata: Metadata = {
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className={`${dmSans.variable} ${playfair.variable} h-full antialiased`}>
+    <html lang="de" className={`${dmSans.variable} ${fraunces.variable} h-full antialiased`}>
       <body className="min-h-full">{children}</body>
     </html>
   );

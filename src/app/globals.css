@@ -15,7 +15,7 @@
   --color-card: var(--card);
   --color-brass: hsl(28 52% 52%);
   --font-sans: var(--font-dm-sans), system-ui, sans-serif;
-  --font-serif: var(--font-playfair), Georgia, serif;
+  --font-serif: var(--font-fraunces), Georgia, serif;
   --text-xs: 0.72rem;
   --text-sm: 0.8125rem;
   --text-base: 0.9375rem;
