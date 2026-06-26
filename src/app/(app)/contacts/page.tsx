@@ -26,7 +26,7 @@ export default async function ContactsPage() {
     {} as Record<string, typeof contacts>
   );
 
-  const categoryOrder = ["FAMILY", "FRIENDS", "COLLEAGUES", "OTHER"];
+  const categoryOrder = ["FAMILY", "PARTNER", "FRIENDS", "COLLEAGUES", "OTHER"];
 
   return (
     <div>

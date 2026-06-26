@@ -7,6 +7,7 @@ import { GERMAN_STATES } from "@/types";
 
 const categories = [
   { value: "FAMILY", label: "Familie" },
+  { value: "PARTNER", label: "Partner" },
   { value: "FRIENDS", label: "Freunde" },
   { value: "COLLEAGUES", label: "Kollegen" },
   { value: "OTHER", label: "Sonstiges" },
@@ -92,7 +93,7 @@ export default function NewContactPage() {
 
         <div>
           <label className={labelClass}>Kategorie *</label>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             {categories.map((cat) => (
               <button
                 key={cat.value}

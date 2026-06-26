@@ -53,6 +53,7 @@ export const RELATIONSHIP_TYPE_LABELS: Record<string, string> = {
 
 export const CATEGORY_LABELS: Record<string, string> = {
   FAMILY: "Familie",
+  PARTNER: "Partner",
   FRIENDS: "Freunde",
   COLLEAGUES: "Kollegen",
   OTHER: "Sonstiges",
@@ -60,6 +61,7 @@ export const CATEGORY_LABELS: Record<string, string> = {
 
 export const CATEGORY_COLORS: Record<string, string> = {
   FAMILY: "bg-rose-100 text-rose-700",
+  PARTNER: "bg-[#c4704a]/10 text-[#a85c38]",
   FRIENDS: "bg-blue-100 text-blue-700",
   COLLEAGUES: "bg-amber-100 text-amber-700",
   OTHER: "bg-gray-100 text-gray-700",
