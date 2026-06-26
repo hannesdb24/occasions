@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getGermanHolidays, filterHolidaysByState, getRelationshipHolidays } from "@/lib/holidays";
 import Link from "next/link";
 import Image from "next/image";
+import { DashboardCalendar } from "@/components/DashboardCalendar";
 
 function getDaysUntil(date: Date): number {
   const now = new Date();
@@ -115,6 +116,16 @@ export default async function DashboardPage() {
   }
 
   upcoming.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  const calendarEvents = upcoming.map((e) => ({
+    id: e.id,
+    contactId: e.contactId,
+    contactName: e.contactName,
+    title: e.title,
+    dateStr: e.date.toISOString().slice(0, 10),
+    daysUntil: e.daysUntil,
+    eventType: e.eventType,
+  }));
 
   const contactCount = user.contacts.length;
   const upcomingCount = upcoming.length;
@@ -271,7 +282,17 @@ export default async function DashboardPage() {
         </div>
 
         {/* Sidebar sections */}
-        <aside className="lg:col-span-2 space-y-12">
+        <aside className="lg:col-span-2 space-y-8">
+          {/* Kalender */}
+          <div className="bg-card border-hairline rounded-2xl p-5">
+            <DashboardCalendar
+              events={calendarEvents}
+              initialYear={now.getFullYear()}
+              initialMonth={now.getMonth()}
+            />
+          </div>
+
+          {/* Demnächst */}
           <section>
             <h3 className="font-serif text-xl font-medium text-[var(--foreground)]">Demnächst</h3>
             <div className="h-px bg-[#c4704a]/30 my-4 w-12" />
@@ -299,27 +320,6 @@ export default async function DashboardPage() {
               </ul>
             )}
           </section>
-
-          <section>
-            <h3 className="font-serif text-xl font-medium text-[var(--foreground)]">Zuletzt gesendet</h3>
-            <div className="h-px bg-[#c4704a]/30 my-4 w-12" />
-            <p className="editorial-italic text-sm">Noch nichts gesendet.</p>
-          </section>
-
-          {user.contacts.length > 0 && (
-            <section>
-              <h3 className="font-serif text-xl font-medium text-[var(--foreground)]">Dein Kreis</h3>
-              <div className="h-px bg-[#c4704a]/30 my-4 w-12" />
-              <ul className="space-y-4">
-                {user.contacts.slice(0, 4).map((contact) => (
-                  <li key={contact.id} className="flex items-center gap-3">
-                    <PersonAvatar name={contact.name} size={32} />
-                    <p className="text-sm font-medium text-[var(--foreground)] truncate flex-1 min-w-0">{contact.name}</p>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
         </aside>
       </div>
     </div>
