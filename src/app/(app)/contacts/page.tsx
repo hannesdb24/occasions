@@ -12,6 +12,13 @@ interface ContactEvent {
   isRecurring: boolean;
 }
 
+interface ContactLinkData {
+  id: string;
+  fromId: string;
+  toId: string;
+  linkType: string;
+}
+
 interface Contact {
   id: string;
   name: string;
@@ -19,6 +26,8 @@ interface Contact {
   category: string;
   relationshipType: string | null;
   events: ContactEvent[];
+  linksFrom: ContactLinkData[];
+  linksTo: ContactLinkData[];
 }
 
 function getAvatarColor(name: string): string {

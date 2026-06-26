@@ -31,8 +31,8 @@ export async function GET(req: NextRequest) {
     include: {
       events: { orderBy: { date: "asc" } },
       linkedUser: { select: { id: true, name: true, image: true } },
-      linksFrom: { select: { id: true, toId: true, linkType: true } },
-      linksTo:   { select: { id: true, fromId: true, linkType: true } },
+      linksFrom: { select: { id: true, fromId: true, toId: true, linkType: true } },
+      linksTo:   { select: { id: true, fromId: true, toId: true, linkType: true } },
     },
     orderBy: { name: "asc" },
   });

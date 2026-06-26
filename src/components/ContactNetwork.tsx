@@ -7,8 +7,8 @@ import { RELATIONSHIP_TYPE_LABELS } from "@/types";
 interface ContactLink {
   id: string;
   linkType: string;
-  fromId?: string;
-  toId?: string;
+  fromId: string;
+  toId: string;
 }
 
 interface NetworkContact {
