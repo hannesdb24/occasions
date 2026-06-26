@@ -10,6 +10,13 @@ function getAvatarColor(name: string): string {
   return colors[name.charCodeAt(0) % colors.length];
 }
 
+const LINK_TYPE_LABELS: Record<string, (isFrom: boolean) => string> = {
+  COUPLE:    () => "Paar",
+  PARENT_OF: (isFrom) => isFrom ? "Elternteil von" : "Kind von",
+  SIBLINGS:  () => "Geschwister",
+  OTHER:     () => "Verbunden mit",
+};
+
 export default async function ContactDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   const { id } = await params;
@@ -25,6 +32,8 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
           wishList: { select: { shareToken: true, isPublic: true, items: { select: { id: true, status: true } } } },
         },
       },
+      linksFrom: { include: { to: { select: { id: true, name: true } } } },
+      linksTo:   { include: { from: { select: { id: true, name: true } } } },
     },
   });
 
@@ -33,6 +42,11 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
   const currentYear = new Date().getFullYear();
   const relHolidays = getRelationshipHolidays(contact.relationshipType as any, currentYear);
   const avatarColor = getAvatarColor(contact.name);
+
+  const allLinks = [
+    ...contact.linksFrom.map((l) => ({ id: l.id, other: l.to, linkType: l.linkType, isFrom: true })),
+    ...contact.linksTo.map((l)   => ({ id: l.id, other: l.from, linkType: l.linkType, isFrom: false })),
+  ];
 
   function getNextOccurrence(date: Date): Date {
     const now = new Date();
@@ -51,7 +65,8 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
         </Link>
       </div>
 
-      <div className="bg-card border-hairline rounded-2xl p-6 mb-6">
+      {/* Header-Karte */}
+      <div className="bg-card border-hairline rounded-2xl p-6 mb-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-4">
             <div
@@ -103,12 +118,81 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
         )}
       </div>
 
+      {/* Verbindungen */}
+      {(contact.relationshipType || allLinks.length > 0) && (
+        <div className="bg-card border-hairline rounded-2xl p-6 mb-4">
+          <h2 className="font-serif text-lg font-medium text-[var(--foreground)] mb-4">Verbindungen</h2>
+          <div className="space-y-2">
+
+            {/* Beziehung zum eingeloggten Nutzer */}
+            {contact.relationshipType && (
+              <div className="flex items-center gap-3 py-2.5 border-b border-[rgba(28,25,22,0.06)]">
+                <div className="w-8 h-8 rounded-full bg-[#1c1916] flex items-center justify-center text-white text-xs font-serif font-medium shrink-0">
+                  Ich
+                </div>
+                <div className="flex-1 flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-medium text-[var(--foreground)]">Du</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-[rgba(28,25,22,0.06)]" style={{ color: "var(--muted-foreground)" }}>
+                    {contact.relationshipType === "MOTHER" || contact.relationshipType === "FATHER" ||
+                     contact.relationshipType === "STEPMOTHER" || contact.relationshipType === "STEPFATHER"
+                      ? "Kind von"
+                      : contact.relationshipType === "CHILD"
+                      ? "Elternteil von"
+                      : contact.relationshipType === "SIBLING" || contact.relationshipType === "BROTHER_IN_LAW" || contact.relationshipType === "SISTER_IN_LAW"
+                      ? "Geschwister /"
+                      : "→"}
+                  </span>
+                  <span className="text-sm font-medium text-[var(--foreground)]">{contact.name}</span>
+                  <span className="text-xs ml-1" style={{ color: "var(--muted-foreground)" }}>
+                    ({RELATIONSHIP_TYPE_LABELS[contact.relationshipType]})
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Kontakt-zu-Kontakt-Links */}
+            {allLinks.map((link) => {
+              const labelFn = LINK_TYPE_LABELS[link.linkType] ?? (() => "Verbunden mit");
+              const label = labelFn(link.isFrom);
+              const otherColor = getAvatarColor(link.other.name);
+              return (
+                <div key={link.id} className="flex items-center gap-3 py-2.5 border-b border-[rgba(28,25,22,0.06)] last:border-0">
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-serif font-medium shrink-0"
+                    style={{ backgroundColor: avatarColor }}
+                  >
+                    {contact.name.charAt(0)}
+                  </div>
+                  <div className="flex-1 flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-medium text-[var(--foreground)]">{contact.name}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-[rgba(28,25,22,0.06)]" style={{ color: "var(--muted-foreground)" }}>
+                      {label}
+                    </span>
+                    <Link href={`/contacts/${link.other.id}`} className="flex items-center gap-1.5 group">
+                      <div
+                        className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-serif font-medium shrink-0"
+                        style={{ backgroundColor: otherColor }}
+                      >
+                        {link.other.name.charAt(0)}
+                      </div>
+                      <span className="text-sm font-medium text-[var(--foreground)] group-hover:text-[#c4704a] transition-considered">
+                        {link.other.name}
+                      </span>
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Anlässe */}
-      <div className="bg-card border-hairline rounded-2xl p-6 mb-6">
-        <h2 className="font-serif text-xl font-medium text-[var(--foreground)] mb-4">Anlässe</h2>
+      <div className="bg-card border-hairline rounded-2xl p-6 mb-4">
+        <h2 className="font-serif text-lg font-medium text-[var(--foreground)] mb-4">Anlässe</h2>
 
         {contact.events.length === 0 && relHolidays.length === 0 && (
-          <p className="text-sm editorial-italic">Keine Anlässe eingetragen.</p>
+          <p className="text-sm editorial-italic" style={{ color: "var(--muted-foreground)" }}>Keine Anlässe eingetragen.</p>
         )}
 
         <div className="space-y-1">
@@ -117,7 +201,6 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
             const now = new Date();
             now.setHours(0, 0, 0, 0);
             const daysUntil = Math.ceil((next.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-
             return (
               <div key={event.id} className="flex items-center justify-between py-3 border-b border-[rgba(28,25,22,0.06)] last:border-0">
                 <div>
@@ -135,7 +218,6 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
               </div>
             );
           })}
-
           {relHolidays.map((h) => {
             const now = new Date();
             now.setHours(0, 0, 0, 0);
@@ -162,9 +244,9 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
       {/* Einladen */}
       {!contact.linkedUserId && (
         <div className="border-brass-hairline bg-[#c4704a]/5 rounded-2xl p-6">
-          <h2 className="font-serif text-xl font-medium text-[var(--foreground)] mb-1">Zu Occasions einladen</h2>
+          <h2 className="font-serif text-lg font-medium text-[var(--foreground)] mb-1">Zu Occasions einladen</h2>
           <p className="text-sm mb-4" style={{ color: "var(--muted-foreground)" }}>
-            {contact.name} kann die App nutzen, eine eigene Wunschliste erstellen und sein Netzwerk aufbauen.
+            {contact.name} kann die App nutzen, eine eigene Wunschliste erstellen und ihr Netzwerk aufbauen.
           </p>
           <Link
             href={`/settings?invite=1&name=${encodeURIComponent(contact.name)}`}

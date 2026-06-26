@@ -271,22 +271,9 @@ export default function EditContactPage() {
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#c4704a]"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
             <span className="kicker">Über die Person</span>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelClass}>Voller Name *</label>
-              <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required className={inputClass} />
-            </div>
-            <div>
-              <label className={labelClass}>Beziehung zu dir</label>
-              <select value={form.relationshipType} onChange={(e) => setForm({ ...form, relationshipType: e.target.value })} className={inputClass}>
-                <option value="">–</option>
-                {relationshipTypes.map((group) => (
-                  <optgroup key={group.group} label={group.group}>
-                    {group.options.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
-                  </optgroup>
-                ))}
-              </select>
-            </div>
+          <div>
+            <label className={labelClass}>Voller Name *</label>
+            <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required className={inputClass} />
           </div>
           <div>
             <label className={labelClass}>Kategorie</label>
@@ -308,8 +295,32 @@ export default function EditContactPage() {
             <span className="kicker">Verbindungen</span>
           </div>
           <p className="text-xs -mt-2" style={{ color: "var(--muted-foreground)" }}>
-            Wie ist {form.name || "diese Person"} mit anderen in deinem Netzwerk verwandt oder verbunden?
+            Wie ist {form.name || "diese Person"} mit dir und anderen in deinem Netzwerk verwandt?
           </p>
+
+          {/* Beziehung zu mir (dem Nutzer) */}
+          <div className="border-hairline rounded-xl p-3">
+            <p className="text-xs font-semibold tracking-wider uppercase text-[#c4704a] mb-2">Beziehung zu mir</p>
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-[#1c1916] flex items-center justify-center text-white text-[10px] font-serif shrink-0">Ich</div>
+              <select
+                value={form.relationshipType}
+                onChange={(e) => setForm({ ...form, relationshipType: e.target.value })}
+                className="flex-1 px-3 py-1.5 border-hairline rounded-lg text-sm bg-[var(--background)] focus:outline-none focus:ring-2 focus:ring-[#c4704a]/30 transition-considered"
+              >
+                <option value="">– keine Angabe –</option>
+                {relationshipTypes.map((group) => (
+                  <optgroup key={group.group} label={group.group}>
+                    {group.options.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
+                  </optgroup>
+                ))}
+              </select>
+              <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-serif shrink-0"
+                style={{ backgroundColor: getAvatarColor(form.name || "A") }}>
+                {(form.name || "?").charAt(0).toUpperCase()}
+              </div>
+            </div>
+          </div>
 
           {links.length > 0 && (
             <div className="space-y-2">
