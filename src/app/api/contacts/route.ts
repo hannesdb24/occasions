@@ -6,7 +6,7 @@ import { z } from "zod";
 const createContactSchema = z.object({
   name: z.string().min(1).max(200),
   birthday: z.string().optional().nullable(),
-  category: z.enum(["FAMILY", "FRIENDS", "COLLEAGUES", "OTHER"]),
+  category: z.enum(["FAMILY", "PARTNER", "FRIENDS", "COLLEAGUES", "OTHER"]),
   relationshipType: z
     .enum(["MOTHER","FATHER","STEPMOTHER","STEPFATHER","PARTNER","SPOUSE","SIBLING","GRANDPARENT","CHILD","FRIEND","COLLEAGUE","OTHER"])
     .optional()
