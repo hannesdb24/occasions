@@ -1,0 +1,15 @@
+name: Tägliche Erinnerungs-E-Mails
+
+on:
+  schedule:
+    - cron: "0 7 * * *"   # täglich um 07:00 UTC (= 08:00 oder 09:00 DE je nach Sommer/Winterzeit)
+  workflow_dispatch:        # manuell auslösbar zum Testen
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Erinnerungen auslösen
+        run: |
+          curl -f -X POST "${{ secrets.APP_URL }}/api/cron/reminders" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}"
