@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(-join \\(\\(1..48\\) | ForEach-Object { [char]\\(Get-Random -Minimum 33 -Maximum 127\\) }\\))",
+      "PowerShell(-join \\(\\(1..48\\) | ForEach-Object { [char]\\(Get-Random -InputObject \\(@\\(48..57\\) + @\\(65..90\\) + @\\(97..122\\)\\)\\) }\\))",
+      "PowerShell(curl *)",
+      "PowerShell(Invoke-RestMethod -Uri \"https://occasions-production-d8d4.up.railway.app/api/admin/reset?secret=delete123\")",
+      "PowerShell(Invoke-WebRequest -Uri \"https://occasions-production-d8d4.up.railway.app/api/admin/reset?secret=delete123\" | Select-Object StatusCode, Content)",
+      "PowerShell(Invoke-RestMethod -Uri \"https://occasions-production-d8d4.up.railway.app/api/admin/reset?secret=delete123\" -MaximumRedirection 0 -ErrorAction SilentlyContinue)",
+      "PowerShell(New-Item *)"
+    ]
+  }
+}
