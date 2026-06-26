@@ -1,15 +1,19 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { AppNav } from "@/components/layout/AppNav";
+import { Sidebar } from "@/components/layout/Sidebar";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <AppNav user={session.user} />
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-8">{children}</main>
+    <div className="min-h-screen bg-gray-50">
+      <Sidebar user={session.user} />
+      <main className="lg:ml-60 min-h-screen">
+        <div className="max-w-5xl mx-auto px-6 py-8 pb-24 lg:pb-8">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

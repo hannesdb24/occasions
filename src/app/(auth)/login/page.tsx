@@ -34,49 +34,50 @@ function LoginForm() {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-      <h2 className="text-xl font-semibold mb-6">Anmelden</h2>
       {searchParams.get("registered") && (
-        <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm">
-          Konto erstellt! Du kannst dich jetzt anmelden.
+        <div className="mb-5 p-3 bg-green-50 text-green-700 rounded-lg text-sm font-medium">
+          Konto erstellt! Jetzt anmelden.
         </div>
       )}
       {error && (
-        <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">{error}</div>
+        <div className="mb-5 p-3 bg-red-50 text-red-600 rounded-lg text-sm">{error}</div>
       )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">E-Mail</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">E-Mail</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            autoComplete="email"
+            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent text-sm"
             placeholder="deine@email.de"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Passwort</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Passwort</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            autoComplete="current-password"
+            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent text-sm"
             placeholder="••••••••"
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+          className="w-full py-2.5 bg-violet-600 text-white rounded-lg font-medium text-sm hover:bg-violet-700 disabled:opacity-50 transition-colors mt-2"
         >
           {loading ? "Anmelden..." : "Anmelden"}
         </button>
       </form>
-      <p className="mt-6 text-center text-sm text-gray-500">
+      <p className="mt-6 text-center text-sm text-gray-400">
         Noch kein Konto?{" "}
-        <Link href="/register" className="text-indigo-600 hover:underline font-medium">
+        <Link href="/register" className="text-violet-600 hover:text-violet-700 font-medium">
           Registrieren
         </Link>
       </p>
@@ -86,11 +87,11 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-white px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-indigo-600">Occasions</h1>
-          <p className="text-gray-500 mt-2">Nie wieder einen Anlass vergessen</p>
+          <h1 className="text-2xl font-semibold text-gray-900">Occasions</h1>
+          <p className="text-gray-400 mt-1.5 text-sm">Anmelden um fortzufahren</p>
         </div>
         <Suspense fallback={<div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 h-64" />}>
           <LoginForm />
