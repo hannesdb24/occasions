@@ -5,9 +5,8 @@
   --foreground: #1c1916;
   --card: #ffffff;
   --border: rgba(28, 25, 22, 0.1);
-  --muted-foreground: rgba(28, 25, 22, 0.5);
+  --muted-foreground: rgba(28, 25, 22, 0.48);
   --primary: #c4704a;
-  --brass: 28 18 8;
 }
 
 @theme inline {
@@ -15,21 +14,26 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-brass: hsl(28 52% 52%);
-  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-sans: var(--font-dm-sans), system-ui, sans-serif;
   --font-serif: var(--font-playfair), Georgia, serif;
+  --text-xs: 0.72rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Utility classes matching the English app */
 .kicker {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 600;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #c4704a;
 }
@@ -37,20 +41,17 @@ body {
 .editorial-italic {
   font-style: italic;
   color: var(--muted-foreground);
+  font-weight: 400;
 }
 
 .border-hairline {
-  border: 0.5px solid rgba(28, 25, 22, 0.12);
+  border: 0.5px solid rgba(28, 25, 22, 0.11);
 }
 
 .border-brass-hairline {
-  border: 0.5px solid rgba(196, 112, 74, 0.3);
+  border: 0.5px solid rgba(196, 112, 74, 0.28);
 }
 
 .transition-considered {
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.text-muted {
-  color: var(--muted-foreground);
 }

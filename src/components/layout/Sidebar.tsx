@@ -74,7 +74,7 @@ export function Sidebar({ user }: SidebarProps) {
         <div className="p-8">
           <Link href="/dashboard" aria-label="Occasions — Dashboard" className="no-underline mb-12 inline-flex">
             <span className="inline-flex flex-col items-center leading-none text-[var(--foreground)]">
-              <span className="font-serif font-medium tracking-tight text-[26px]">Occasions</span>
+              <span className="font-serif font-medium tracking-tight text-[22px]">Occasions</span>
               <span aria-hidden="true" className="mt-1.5 h-px w-2/3 bg-[#c4704a] opacity-80" />
             </span>
           </Link>

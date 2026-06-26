@@ -100,7 +100,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <span className="inline-flex flex-col items-center leading-none">
-            <span className="font-serif font-medium tracking-tight text-[32px] text-[var(--foreground)]">Occasions</span>
+            <span className="font-serif font-medium tracking-tight text-[28px] text-[var(--foreground)]">Occasions</span>
             <span className="mt-1.5 h-px w-2/3 bg-[#c4704a] opacity-80" />
           </span>
           <p className="mt-4 text-sm" style={{ color: "var(--muted-foreground)" }}>Neues Konto erstellen</p>

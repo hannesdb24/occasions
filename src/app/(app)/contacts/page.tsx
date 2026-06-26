@@ -33,7 +33,7 @@ export default async function ContactsPage() {
       <header className="flex items-center justify-between mb-10">
         <div>
           <p className="kicker mb-2">Dein Kreis</p>
-          <h1 className="font-serif text-3xl font-medium text-[var(--foreground)]">Personen</h1>
+          <h1 className="font-serif text-2xl font-medium text-[var(--foreground)]">Personen</h1>
           <p className="text-sm mt-1" style={{ color: "var(--muted-foreground)" }}>
             {contacts.length === 0
               ? "Noch niemanden hinzugefügt"

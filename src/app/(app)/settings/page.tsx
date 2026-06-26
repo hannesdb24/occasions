@@ -34,7 +34,7 @@ export default function SettingsPage() {
     <div className="max-w-xl space-y-10">
       <header>
         <p className="kicker mb-2">Konto</p>
-        <h1 className="font-serif text-3xl font-medium text-[var(--foreground)]">Einstellungen</h1>
+        <h1 className="font-serif text-2xl font-medium text-[var(--foreground)]">Einstellungen</h1>
       </header>
 
       {/* Einladung */}

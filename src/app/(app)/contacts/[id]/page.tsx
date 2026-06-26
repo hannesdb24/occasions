@@ -61,7 +61,7 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
               {contact.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 className="font-serif text-2xl font-medium text-[var(--foreground)]">{contact.name}</h1>
+              <h1 className="font-serif text-xl font-medium text-[var(--foreground)]">{contact.name}</h1>
               <div className="flex items-center gap-2 mt-1.5">
                 <span className="text-xs px-2.5 py-1 rounded-full bg-[rgba(28,25,22,0.06)] font-medium text-[var(--foreground)]">
                   {CATEGORY_LABELS[contact.category]}

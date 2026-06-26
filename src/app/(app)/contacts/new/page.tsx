@@ -74,7 +74,7 @@ export default function NewContactPage() {
       </div>
       <div className="mb-8">
         <p className="kicker mb-2">Neu</p>
-        <h1 className="font-serif text-3xl font-medium text-[var(--foreground)]">Person anlegen</h1>
+        <h1 className="font-serif text-2xl font-medium text-[var(--foreground)]">Person anlegen</h1>
       </div>
 
       {error && <div className="mb-5 p-3 bg-red-50 text-red-700 rounded-xl text-sm">{error}</div>}

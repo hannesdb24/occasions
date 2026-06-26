@@ -94,7 +94,7 @@ export default async function OccasionsPage() {
       <header className="flex items-center justify-between mb-10">
         <div>
           <p className="kicker mb-2">Kalender</p>
-          <h1 className="font-serif text-3xl font-medium text-[var(--foreground)]">Anlässe</h1>
+          <h1 className="font-serif text-2xl font-medium text-[var(--foreground)]">Anlässe</h1>
           <p className="text-sm mt-1" style={{ color: "var(--muted-foreground)" }}>Nächste 12 Monate</p>
         </div>
         <Link

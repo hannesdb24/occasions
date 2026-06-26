@@ -94,7 +94,7 @@ export default function WishListPage() {
       <header className="flex items-center justify-between mb-10">
         <div>
           <p className="kicker mb-2">Meine Liste</p>
-          <h1 className="font-serif text-3xl font-medium text-[var(--foreground)]">Wunschliste</h1>
+          <h1 className="font-serif text-2xl font-medium text-[var(--foreground)]">Wunschliste</h1>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}

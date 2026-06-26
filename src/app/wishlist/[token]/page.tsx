@@ -34,10 +34,10 @@ export default async function PublicWishListPage({ params }: { params: Promise<{
       <div className="max-w-xl mx-auto px-4 py-14">
         <div className="text-center mb-10">
           <span className="inline-flex flex-col items-center leading-none mb-8">
-            <span className="font-serif font-medium tracking-tight text-[24px] text-[var(--foreground)]">Occasions</span>
+            <span className="font-serif font-medium tracking-tight text-[20px] text-[var(--foreground)]">Occasions</span>
             <span className="mt-1.5 h-px w-2/3 bg-[#c4704a] opacity-80" />
           </span>
-          <h1 className="font-serif text-3xl font-medium text-[var(--foreground)] mt-6">
+          <h1 className="font-serif text-2xl font-medium text-[var(--foreground)] mt-6">
             {wishList.ownerName ? `${wishList.ownerName}s Wunschliste` : wishList.title}
           </h1>
           <p className="text-sm mt-2" style={{ color: "var(--muted-foreground)" }}>

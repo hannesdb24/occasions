@@ -132,10 +132,10 @@ export default async function DashboardPage() {
       {/* Header */}
       <header className="mb-12 pt-2">
         <p className="kicker mb-4">{formatDate()}</p>
-        <h1 className="font-serif text-5xl md:text-6xl font-medium tracking-tight text-[var(--foreground)] leading-[1.05] mb-6">
+        <h1 className="font-serif text-4xl md:text-5xl font-medium tracking-tight text-[var(--foreground)] leading-[1.05] mb-5">
           {getGreeting(user.name)}
         </h1>
-        <p className="editorial-italic text-xl max-w-2xl leading-relaxed">{subtitle}</p>
+        <p className="editorial-italic text-lg max-w-2xl leading-relaxed">{subtitle}</p>
         {contactCount > 0 && (
           <Link href="/occasions" className="inline-flex items-center gap-2 mt-5 text-sm font-semibold text-[#c4704a] hover:text-[#a85c38]">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -157,7 +157,7 @@ export default async function DashboardPage() {
               </svg>
               <span className="kicker">Personen</span>
             </div>
-            <div className="font-serif font-medium text-3xl md:text-4xl tracking-tight text-[var(--foreground)]">{contactCount}</div>
+            <div className="font-serif font-medium text-[28px] md:text-[36px] tracking-tight text-[var(--foreground)]">{contactCount}</div>
           </div>
         </Link>
 
@@ -170,7 +170,7 @@ export default async function DashboardPage() {
               <span className="kicker">Anlässe</span>
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="font-serif font-medium text-3xl md:text-4xl tracking-tight text-[var(--foreground)]">{upcomingCount}</span>
+              <span className="font-serif font-medium text-[28px] md:text-[36px] tracking-tight text-[var(--foreground)]">{upcomingCount}</span>
               <span className="text-sm italic" style={{ color: "var(--muted-foreground)" }}>anlässe</span>
             </div>
           </div>
@@ -185,7 +185,7 @@ export default async function DashboardPage() {
               <span className="kicker">Gesendet</span>
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="font-serif font-medium text-3xl md:text-4xl tracking-tight text-[var(--foreground)]">0</span>
+              <span className="font-serif font-medium text-[28px] md:text-[36px] tracking-tight text-[var(--foreground)]">0</span>
               <span className="text-sm italic" style={{ color: "var(--muted-foreground)" }}>geschenke</span>
             </div>
           </div>
@@ -198,7 +198,7 @@ export default async function DashboardPage() {
             </svg>
             <span className="kicker">Diesen Monat</span>
           </div>
-          <div className="font-serif font-medium text-3xl md:text-4xl tracking-tight text-[var(--foreground)]">€0</div>
+          <div className="font-serif font-medium text-[28px] md:text-[36px] tracking-tight text-[var(--foreground)]">€0</div>
           <p className="text-xs italic mt-2" style={{ color: "var(--muted-foreground)" }}>kein Budget gesetzt</p>
         </div>
       </section>
@@ -220,10 +220,10 @@ export default async function DashboardPage() {
               </div>
               <div className="p-8 md:p-10">
                 <p className="kicker mb-3">Demnächst · in {featuredEvent.daysUntil} Tagen</p>
-                <h2 className="font-serif text-3xl md:text-4xl font-medium leading-tight mb-4">
+                <h2 className="font-serif text-2xl md:text-3xl font-medium leading-tight mb-4">
                   {featuredEvent.contactName ? `${featuredEvent.contactName}s ${featuredEvent.title}` : featuredEvent.title}
                 </h2>
-                <p className="editorial-italic text-lg mb-8 leading-relaxed">
+                <p className="editorial-italic text-base mb-8 leading-relaxed">
                   Das wäre ein schöner Moment für ein Geschenk.
                 </p>
                 <div className="flex items-center gap-4 pt-6 border-t border-[rgba(28,25,22,0.08)]">
@@ -254,8 +254,8 @@ export default async function DashboardPage() {
               </div>
               <div className="p-8 md:p-10">
                 <p className="kicker mb-3">Erste Schritte</p>
-                <h2 className="font-serif text-3xl font-medium leading-tight mb-4">Leg deine erste Person an.</h2>
-                <p className="editorial-italic text-lg mb-8 leading-relaxed">Füge Kontakte hinzu, um Geburtstage und Jubiläen nie mehr zu vergessen.</p>
+                <h2 className="font-serif text-2xl font-medium leading-tight mb-4">Leg deine erste Person an.</h2>
+                <p className="editorial-italic text-base mb-8 leading-relaxed">Füge Kontakte hinzu, um Geburtstage und Jubiläen nie mehr zu vergessen.</p>
                 <Link
                   href="/contacts/new"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[var(--foreground)] text-[var(--card)] text-sm font-medium transition-considered hover:opacity-90"
@@ -273,7 +273,7 @@ export default async function DashboardPage() {
         {/* Sidebar sections */}
         <aside className="lg:col-span-2 space-y-12">
           <section>
-            <h3 className="font-serif text-2xl font-medium text-[var(--foreground)]">Demnächst</h3>
+            <h3 className="font-serif text-xl font-medium text-[var(--foreground)]">Demnächst</h3>
             <div className="h-px bg-[#c4704a]/30 my-4 w-12" />
             {comingUpNext.length === 0 ? (
               <p className="editorial-italic text-sm">Keine Anlässe in Sicht.</p>
@@ -301,14 +301,14 @@ export default async function DashboardPage() {
           </section>
 
           <section>
-            <h3 className="font-serif text-2xl font-medium text-[var(--foreground)]">Zuletzt gesendet</h3>
+            <h3 className="font-serif text-xl font-medium text-[var(--foreground)]">Zuletzt gesendet</h3>
             <div className="h-px bg-[#c4704a]/30 my-4 w-12" />
             <p className="editorial-italic text-sm">Noch nichts gesendet.</p>
           </section>
 
           {user.contacts.length > 0 && (
             <section>
-              <h3 className="font-serif text-2xl font-medium text-[var(--foreground)]">Dein Kreis</h3>
+              <h3 className="font-serif text-xl font-medium text-[var(--foreground)]">Dein Kreis</h3>
               <div className="h-px bg-[#c4704a]/30 my-4 w-12" />
               <ul className="space-y-4">
                 {user.contacts.slice(0, 4).map((contact) => (
