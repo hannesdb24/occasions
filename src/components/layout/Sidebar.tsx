@@ -59,7 +59,7 @@ const navItems = [
 function Avatar({ name }: { name?: string | null }) {
   const initial = name?.charAt(0).toUpperCase() ?? "?";
   return (
-    <div className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm font-semibold flex-shrink-0">
+    <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center text-sm font-semibold flex-shrink-0">
       {initial}
     </div>
   );
@@ -90,8 +90,8 @@ export function Sidebar({ user }: SidebarProps) {
                 href={item.href}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                   isActive
-                    ? "text-gray-900 font-semibold"
-                    : "text-gray-400 hover:text-gray-700 font-medium"
+                    ? "bg-stone-100 text-gray-900 font-semibold"
+                    : "text-gray-400 hover:text-gray-700 hover:bg-stone-50 font-medium"
                 }`}
               >
                 <span className={isActive ? "text-gray-900" : "text-gray-400"}>

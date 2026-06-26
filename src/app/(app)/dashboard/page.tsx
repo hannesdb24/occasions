@@ -181,7 +181,7 @@ export default async function DashboardPage() {
         <p className="text-xs font-semibold tracking-widest text-gray-400 mb-3">
           {formatDate(new Date())}
         </p>
-        <h1 className="text-5xl font-bold text-gray-900 leading-tight mb-4">
+        <h1 className="text-6xl font-bold text-gray-900 leading-tight mb-4" style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}>
           {getGreeting(user.name)}
         </h1>
         <p className="text-gray-500 text-lg leading-relaxed max-w-2xl">{subtitle}</p>
