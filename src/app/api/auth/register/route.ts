@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ id: user.id, email: user.email, name: user.name }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors }, { status: 400 });
+      return NextResponse.json({ error: "Bitte alle Felder korrekt ausfüllen (Name min. 2 Zeichen, Passwort min. 8 Zeichen)" }, { status: 400 });
     }
     console.error(error);
     return NextResponse.json({ error: "Interner Fehler" }, { status: 500 });
