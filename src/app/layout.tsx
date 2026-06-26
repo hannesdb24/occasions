@@ -6,7 +6,6 @@ const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-dm-sans",
   axes: ["opsz"],
-  weight: ["300", "400", "500", "600"],
 });
 const playfair = Playfair_Display({
   subsets: ["latin"],
